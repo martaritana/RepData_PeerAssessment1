@@ -1,3 +1,8 @@
+---
+output:
+  html_document:
+    keep_md: yes
+---
 # Reproducible Research: Peer Assessment 1
 Margarette K.
 ```{r, echo=FALSE, results='hide'}
@@ -26,6 +31,10 @@ library(ggplot2)
 activity.by.date <- aggregate(steps ~ date, data = activity, FUN = sum)
 qplot(date, steps, data=activity.by.date, geom = "histogram", stat = "identity", main = "Total number of steps per date", ylab = "number of steps")
 ```
+```{r step_hist_plot_save, echo=FALSE, results='hide'}
+ggsave('figures/01_steps_per_date.png', width=4.8, height=4.8, dpi=100)
+```
+
 The mean and median total number of steps taken per day.
 ```{r mean_median, echo=TRUE}
 steps.mean <- aggregate(steps ~ date, data = activity, FUN = mean)
@@ -39,7 +48,10 @@ merge(steps.mean, steps.median)
 Time series of 5 minut interval...
 ```{r interval, echo=TRUE}
 activity.by.interval <- aggregate(steps ~ interval, data = activity, FUN = mean)
-qplot(interval, steps, data=activity.by.interval, geom = "line", main = "The average number of steps taken, averaged across all days", xlab = "5-minute interval ", ylab = "the average number of steps taken")
+qplot(interval, steps, data=activity.by.interval, geom = "line", main = "Average number of steps per 5-minute interval", xlab = "5-minute interval ", ylab = "number of steps")
+```
+```{r interval_plot_save, echo=FALSE, results='hide'}
+ggsave('figures/02_mean_steps_per_interval.png', width=4.8, height=4.8, dpi=100)
 ```
 
 The 5-minute interval = 835, on average across all the days in the dataset, contains the maximum number of steps = 206.1698.
@@ -75,6 +87,9 @@ Histigram of steps per date.
 library(ggplot2)
 activity.by.date <- aggregate(steps ~ date, data = activity.filled, FUN = sum)
 qplot(date, steps, data=activity.by.date, geom = "histogram", stat = "identity", main = "Total number of steps per date", ylab = "number of steps")
+```
+```{r step_hist_filled_plot_save, echo=FALSE, results='hide'}
+ggsave('figures/03_steps_per_date_filled_nas.png', width=4.8, height=4.8, dpi=100)
 ```
 
 The mean and median total number of steps taken per day.
