@@ -70,4 +70,22 @@ activity.filled <- ldply(lapply(split(activity, as.factor(activity$date)), funct
 activity.filled <- activity.filled[, 2:ncol(activity.filled)]
 ```
 
+Histigram of steps per date.
+```{r step_hist_filled, echo=TRUE}
+library(ggplot2)
+activity.by.date <- aggregate(steps ~ date, data = activity.filled, FUN = sum)
+qplot(date, steps, data=activity.by.date, geom = "histogram", stat = "identity", main = "Total number of steps per date", ylab = "number of steps")
+```
+
+The mean and median total number of steps taken per day.
+```{r mean_median_filled, echo=TRUE}
+steps.mean <- aggregate(steps ~ date, data = activity.filled, FUN = mean)
+names(steps.mean) <- c("date", "mean_steps")
+steps.median <- aggregate(steps ~ date, data = activity.filled, FUN = median)
+names(steps.median) <- c("date", "median_steps")
+merge(steps.mean, steps.median)
+```
+Now we have medians that are not zero.
+
 ## Are there differences in activity patterns between weekdays and weekends?
+
