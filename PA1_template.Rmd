@@ -1,20 +1,73 @@
 # Reproducible Research: Peer Assessment 1
-
+Margarette K.
+```{r, echo=FALSE, results='hide'}
+# reset locale to default english
+Sys.setlocale(locale = "C")
+```
 
 ## Loading and preprocessing the data
 
-
+At first unzip and read our data.
+```{r download, echo=TRUE}
+unzip("activity.zip", exdir = "data")
+activity <- read.csv("data/activity.csv")
+```
+Now we have dataset called "activity". Formatting dates from factors to dates. Take a look at it with summury function.
+```{r summary_activity, echo=TRUE}
+activity$date <- as.Date(activity$date)
+summary(activity)
+```
 
 ## What is mean total number of steps taken per day?
 
-
-
+Histigram of steps per date.
+```{r step_hist, echo=TRUE}
+library(ggplot2)
+activity.by.date <- aggregate(steps ~ date, data = activity, FUN = sum)
+qplot(date, steps, data=activity.by.date, geom = "histogram", stat = "identity", main = "Total number of steps per date", ylab = "number of steps")
+```
+The mean and median total number of steps taken per day.
+```{r mean_median, echo=TRUE}
+steps.mean <- aggregate(steps ~ date, data = activity, FUN = mean)
+names(steps.mean) <- c("date", "mean_steps")
+steps.median <- aggregate(steps ~ date, data = activity, FUN = median)
+names(steps.median) <- c("date", "median_steps")
+merge(steps.mean, steps.median)
+```
 ## What is the average daily activity pattern?
 
+Time series of 5 minut interval...
+```{r interval, echo=TRUE}
+activity.by.interval <- aggregate(steps ~ interval, data = activity, FUN = mean)
+qplot(interval, steps, data=activity.by.interval, geom = "line", main = "The average number of steps taken, averaged across all days", xlab = "5-minute interval ", ylab = "the average number of steps taken")
+```
 
+The 5-minute interval = 835, on average across all the days in the dataset, contains the maximum number of steps = 206.1698.
+
+```{r max.interval, echo=TRUE}
+library(plyr)
+interval.max.desc <- arrange(activity.by.interval, desc(steps))
+head(interval.max.desc)
+```
+So, this is the time to go to work 8:35
 
 ## Imputing missing values
 
-
+The total numer of NA in dataset = 2304.
+```{r na, echo=TRUE}
+sum(is.na(activity))
+```
+Fill the NA's with the mean for that 5-minute interval.
+```{r fill_na, echo=TRUE}
+activity.filled <- ldply(lapply(split(activity, as.factor(activity$date)), function(ad) {
+  for(i in ad$interval) {
+    if (is.na(ad[ad$interval == i, ]$steps)) {
+      ad[ad$interval == i, ]$steps <- activity.by.interval[activity.by.interval$interval == i, ]$steps
+    }
+  }
+  ad
+}), data.frame)
+activity.filled <- activity.filled[, 2:ncol(activity.filled)]
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
