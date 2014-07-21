@@ -45,7 +45,7 @@ merge(steps.mean, steps.median)
 ```
 ## What is the average daily activity pattern?
 
-Time series of 5 minut interval...
+Time series of 5 minute interval on the plot that illustrates activity height during a day.
 ```{r interval, echo=TRUE}
 activity.by.interval <- aggregate(steps ~ interval, data = activity, FUN = mean)
 qplot(interval, steps, data=activity.by.interval, geom = "line", main = "Average number of steps per 5-minute interval", xlab = "5-minute interval ", ylab = "number of steps")
@@ -104,3 +104,19 @@ Now we have medians that are not zero.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+```{r weekdays, echo=TRUE}
+activity.filled$day_type <- as.factor(as.numeric(weekdays(activity.filled$date) %in% c("Saturday", "Sunday")))
+levels(activity.filled$day_type)[1] <- 'weekday'
+levels(activity.filled$day_type)[2] <- 'weekend'
+```
+
+Plotting mean number of steps for weekdays and weekends separately.
+```{r weekdays_interval, echo=TRUE}
+activity.by.interval <- aggregate(steps ~ interval + day_type, data = activity.filled, FUN = mean)
+qplot(interval, steps, data=activity.by.interval, geom = "line", xlab = "5-minute interval ", ylab = "number of steps", facets = day_type ~ .)
+```
+```{r weekdays_interval_plot_save, echo=FALSE, results='hide'}
+ggsave('figures/04_mean_steps_per_interval_weekdays_weekends.png', width=4.8, height=4.8, dpi=100)
+```
+
+At weekends the man wakes up late. Activity during a weekend is smoother.
